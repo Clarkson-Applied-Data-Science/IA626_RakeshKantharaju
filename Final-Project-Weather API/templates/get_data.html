@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{ n } Records</title>
+</head>
+<body>
+    <p><b>Records</b></p>
+{% for table in tables %}
+            {{titles[loop.index]}}
+            {{ table|safe }}
+{% endfor %}
+<!-- <a href=/map/plot ><button class=grey style="height:75px;width:150px">get_station_on_map</button></a> -->
+</body>
+</html>
