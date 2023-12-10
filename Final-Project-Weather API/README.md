@@ -165,7 +165,7 @@ The loader files job is to read the required csv files from the folders and clea
 
 Considering the data size of hourly weather data for all stations over the world for a given year, I am loading the weather data for stations whose location fall under this polygon.
 
-<img src='Images/weather_data_polygon.png' width='380'>
+<img src='Images/hourly/weather_data_polygon.png' width='380'>
 
 The coordinates for this polygon is stored in 'polygon_geojson.txt' file.We will be using this file in our loader script.
 
@@ -207,7 +207,7 @@ sample=pd.read_csv('station_files_hourly/01001099999.csv')
 sample.head(3)
 ```
 
-<img src='Images/weather_hourly_sample_dataset.png' width='580'>
+<img src='Images/hourly/weather_hourly_sample_dataset.png' width='580'>
 
 Read the polygon file and extract latitude and longitude values.
 Create a polygon using these coordinates and test if potsdam coordinates fall under this polygon.
@@ -218,7 +218,7 @@ p=json.load(f) # load json
 print(p)
 
 ```
-<img src='Images/polygon_json.png' width='580'>
+<img src='Images/hourly/polygon_json.png' width='580'>
 
 ```python
 coordinates = p['geometry']['coordinates'][0] # get coordinates
@@ -228,7 +228,7 @@ for i in range(len(coordinates)): # rearrange lon,lat to lat,lon
 
 print(coordinates)
 ```
-<img src='Images/coordinates.png' width='380' height='100'>
+<img src='Images/hourly/coordinates.png' width='380' height='100'>
 
 ```python
 # create a polygon and test is potsdam cooridnates fall under this polygon
@@ -238,7 +238,7 @@ point = Point(44.5588, -72.5778)
 print(polygon.contains(point))
 
 ```
-<img src='Images/true.png' width='780' height='20'>
+<img src='Images/hourly/true.png' width='780' height='20'>
 
 Iterate through all the files in the 'station_files_hourly' folder and create a list of paths for each file.Once the list is created ,
 iterate through all files using the paths list and read first lines of each file to extract the lat and lon values.We dont need to read the whole file to get the coordinates because lat and lon values for a station will be the same for all the rows.\
@@ -275,7 +275,7 @@ for file in files:
 print(d)
 ```
 
-<img src='Images/path_dict.png' width='500' height='400'>
+<img src='Images/hourly/path_dict.png' width='500' height='400'>
 
 Read only required columns and handle files which has missing columns by filling 999999 as missing values.
 
@@ -294,7 +294,7 @@ frame = pd.concat(fdf, axis=0, ignore_index=True)
 frame.head()
 ```
 
-<img src='Images/frame_hourly.png' width='580' >
+<img src='Images/hourly/frame_hourly.png' width='580' >
 
 Handle datatypes and Tranformations
 
@@ -304,7 +304,7 @@ print("Unique station count:",frame.STATION.nunique())
 print("no of files:",len(d))
 
 ```
-<img src='Images/check_unique_stations_hourly.png' width='580' >
+<img src='Images/hourly/check_unique_stations_hourly.png' width='580' >
 
 
 ```python
@@ -334,7 +334,7 @@ frame=frame[cols_order]
 frame.head()
 
 ```
-<img src='Images/hourly_frame_expand.png' width='580' >
+<img src='Images/hourly/hourly_frame_expand.png' width='580' >
 
 
 Load Station info
@@ -374,7 +374,7 @@ station_info=station_details.merge(country_df,on=['COUNTRY_CODE'],how='left')
 station_info
 
 ```
-<img src='Images/station_info_hourly.png' width='580' >
+<img src='Images/hourly/station_info_hourly.png' width='580' >
 
 
 Connect to mysql server and the database
@@ -399,7 +399,7 @@ Load station_info to `station_info` table using `to_sql` function
 station_info.to_sql('stations_info',con = engine,if_exists='replace',index=False)
 ```
 
-<img src='Images/station_info_load_hourly.png' width='580' >
+<img src='Images/hourly/station_info_load_hourly.png' width='580' >
 
 Update Index
 
@@ -423,7 +423,7 @@ print("shape:",zipcodes.shape)
 zipcodes.head()
 
 ```
-<img src='Images/zip_codes_info_houlry.png' width='580' >
+<img src='Images/hourly/zip_codes_info_houlry.png' width='580' >
 
 clean and tranform before loading to databse table
 
@@ -437,14 +437,14 @@ zipcodes.columns=cols
 
 zipcodes.head()
 ```
-<img src='Images/zip_code_info_load_data_houlry.png' width='580' >
+<img src='Images/hourly/zip_code_info_load_data_houlry.png' width='580' >
 
 ```python
 # insert zipcodes to the table
 zipcodes.to_sql('zipcodes_info',con = engine,if_exists='replace',index=False,schema="weather_hourly")
 
 ```
-<img src='Images/zipcode_houlry_rows_loaded.png' width='580' >
+<img src='Images/hourly/zipcode_houlry_rows_loaded.png' width='580' >
 
 
 
@@ -475,7 +475,7 @@ wdf.head(3)
 wdf[['station_id','date']].drop_duplicates().shape,wdf.shape
 ```
 
-<img src='Images/hourly_weather_dup_check.png' width='580' >
+<img src='Images/hourly/hourly_weather_dup_check.png' width='580' >
 
 Looks like there are duplicates
 
@@ -485,7 +485,7 @@ wdf = wdf.drop_duplicates(subset=['station_id', 'date'], keep='first')
 wdf.shape
 
 ```
-<img src='Images/after_remove_dup_hourly.png' width='580' >
+<img src='Images/hourly/after_remove_dup_hourly.png' width='580' >
 
 ```python
 # insert weather data to a table 
@@ -493,7 +493,7 @@ wdf.to_sql('weather_info_2022_hourly',con = engine,if_exists='replace',index=Fal
 
 ```
 
-<img src='Images/weather_hourly_loaded_rows.png' width='580' >
+<img src='Images/hourly/weather_hourly_loaded_rows.png' width='580' >
 
 Update Index
 
