@@ -1,11 +1,11 @@
-**Final Project IA626 - Weather API**
+# **Final Project IA626 - Weather API**
 ##### Author: Rakesh Kantharaju
 
-#### Project Description:
+## Project Description:
 
 Build an API which gets you daily and hourly weather data for year 2022.
 
-#### General Approach:
+## General Approach:
 
 - We have weather data stored in csv files and each csv file contains either houlry or daily weather data for a given station.We also have csv files which contains all the zip codes info all over the world.
 - For our API to query the data, we need to store this data in structered tables in a database, therefore I use docker to create a MySQL local instance, and create database and tables to load this data.
