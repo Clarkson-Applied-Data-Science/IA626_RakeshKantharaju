@@ -3,7 +3,7 @@
 
 ## Project Description:
 
-Build an API which gets you daily and hourly weather data for year 2022.
+Using the available weather data, build an API which allows user to fetch weather information at different levels for the year 2022.
 
 ## General Approach:
 
@@ -24,11 +24,11 @@ https://www.ncei.noaa.gov/data/global-summary-of-the-day/archive/
 
 Lets understand the datasets here.
 
-#### Hourly weather
+### Hourly weather
 
 You can look at the sample data for hourly weather in 'sample_files' folder.
 
-##### Data Description
+#### Data Description
 ( Detailed data description is available in data_description folder)
 
 STATION - Station identifier no 
@@ -93,11 +93,11 @@ SLP - Sea level Observation
     a - sea level pressure
     b - sea level pressure quality code
 
-#### Daily weather
+### Daily weather
 
 You can look at the sample data for hourly weather in 'sample_files' folder.
 
-##### Data Description
+#### Data Description
 ( Detailed data description is available in data_description folder)
 
 FIELD DESCRIPTION\
@@ -126,9 +126,9 @@ MAX - Maximum temperature reported during the day in Fahrenheit to tenths. Missi
 Note: Time of maximum temperature report varies by country and region, so this will sometimes
 not be the maximum for the calendar day. 
 
+## Approach
 
-
-## Create local MYSQL instance using docker
+## Create local MYSQL instance using Docker
 Docker is a platform for developing, shipping, and running applications in containers. Containers are lightweight, standalone, and executable packages that include everything needed to run a piece of software, including the code, runtime, libraries, and system tools. Docker provides a consistent and portable environment across different machines, making it easier to deploy and scale applications.
 
 * Step 1 : Download and install docker from the given site.
@@ -157,11 +157,11 @@ services:
 * Step 5 : Go to `localhost:8080` which should open the login page of phpmyadmin, username=root and password is 'password' as given in config file(can be changed this if needed). Your MySQL server is ready and you can start using it.
 * Step 6 : Create two databases `weather_houlry` and `weather` for our api project.
 
-### Build python loader files
+## Build python loader files
 
 The loader files job is to read the required csv files from the folders and cleans the data, perform transformations and finally load the data in MySQL tables.
 
-#### Load hourly weather data
+### Load hourly weather data
 
 Considering the data size of hourly weather data for all stations over the world for a given year, I am loading the weather data for stations whose location fall under this polygon.
 
@@ -337,7 +337,7 @@ frame.head()
 <img src='Images/hourly/hourly_frame_expand.png' width='580' >
 
 
-Load Station info
+#### Insert Station info
 
 Create station_info table which contains only station details.Since we only have station no, their coordinates, name and country code, we need to add country name and create a station id which will be the primary key because station no is long int which is not good to be a primary key which takes more space.
 
@@ -401,7 +401,7 @@ station_info.to_sql('stations_info',con = engine,if_exists='replace',index=False
 
 <img src='Images/hourly/station_info_load_hourly.png' width='580' >
 
-Update Index
+##### Update Index
 
 ```python
 
@@ -412,7 +412,7 @@ engine.execute(update_index_sql)
 
 ```
 
-Load Zip codes info
+#### Insert Zip codes info
 
 We need zipcodes info for all places over the world because we donot have these info in our weather dataset, and it is very important attribute for our api.
 
@@ -448,7 +448,7 @@ zipcodes.to_sql('zipcodes_info',con = engine,if_exists='replace',index=False,sch
 
 
 
-Load Houlry Weather data
+#### Insert Houlry Weather data
 
 ```python
 # get station id from station_info
@@ -495,7 +495,7 @@ wdf.to_sql('weather_info_2022_hourly',con = engine,if_exists='replace',index=Fal
 
 <img src='Images/hourly/weather_hourly_loaded_rows.png' width='580' >
 
-Update Index
+##### Update Index
 
 ```python
 
@@ -507,7 +507,7 @@ engine.execute(update_index_sql)
 ```
 
 
-#### Load daily weather data
+### Load daily weather data
 
 Import necessary packages
 
@@ -601,7 +601,7 @@ frame.shape,frame.drop_duplicates().shape
 
 Therefore, no duplicates
 
-Insert stations_info
+#### Insert stations_info
 
 ```python
 # create station details df and add primary key using index
@@ -650,14 +650,14 @@ station_info[['station_id','latitude','longitude']].drop_duplicates().shape,stat
 
 <img src='Images/daily/station_info_dup_check.png' width='580' >
 
-There are suplicates, so remove duplicate rows
+There are duplicates, so remove duplicate rows
 
 ```python
 station_info = station_info.drop_duplicates(subset=['station_id','latitude','longitude'], keep='first')
 ```
 <img src='Images/daily/station_info_after_dup_check.png' width='580' >
 
-Connect to MySQL server and weather database
+##### Connect to MySQL server and weather database
 
 ```python
 # connect to the database 
@@ -678,7 +678,7 @@ station_info.to_sql('stations_info',con = engine,if_exists='replace', index=Fals
 
 <img src='Images/daily/station_info_load_rows.png' width='580' >
 
-Update Index
+##### Update Index
 
 ```python
 
@@ -689,7 +689,7 @@ engine.execute(update_index_sql)
 
 ```
 
-Load Zip Codes Info
+#### Insert Zip Codes Info
 
 ```python
 zipcodes=pd.read_csv('additional_files/geonames-postal.csv',on_bad_lines='skip',delimiter=';')
@@ -706,7 +706,7 @@ zipcodes.to_sql('zipcodes_info',con = engine,if_exists='replace',index=False)
 ```
 <img src='Images/daily/zip_codes_load_rows.png' width='580' >
 
-Insert weather data of every station
+#### Insert daily weather data for every station
 
 ```python
 # get station id
@@ -759,7 +759,7 @@ engine.execute(update_index_sql)
 
 ```
 
-##### We have successfully laoded all weather datasets to the database tabels
+*We have successfully loaded all weather datasets to the database tabels*
 
 ### Build SQL queries to fetch data from database
 
