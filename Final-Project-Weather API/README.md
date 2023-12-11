@@ -1252,11 +1252,11 @@ def get_nearest_stations():
         output.append(item)
 
     res['results']=output
-    res['num_results']=len(output)
-    res['sql_time']=round(end_time-start_time,2)
+    res['num_results']=len(output) # number of results
+    res['sql_time']=round(end_time-start_time,2) # time taken to get the output
     
     res['req']='/get_nearest_stations'
-    return json.dumps(res,indent=4)
+    return json.dumps(res,indent=4) # return json
 ```
 
 <img src='Images/api_outputs/get_nearest_stations.png' width='580' >
@@ -1266,7 +1266,8 @@ def get_nearest_stations():
 **getTableData_nearest_stations**
 
 This endpoint allows user to look at nearest stations data for a given lat and lon values in tablular format.\
-You can search by rows, sort and download the data to csv.
+You can search by rows, sort and download the data to csv.\
+The API returns a html instead of a json, with the help of `table3.html` which receives the dataframe as an argument, produces a tablualar dataframe on the webpage, as shown in below results. This mechanism is used everywhere in this API wherever we are displaying the results as a tabluar data on the web page.
 
 endpoint example : http://10.2.3.251:5000/getTableData_nearest_stations?key=123&lat=44.6592&lon=-74.9681&n=5
 
@@ -1315,7 +1316,7 @@ def getTableData_nearest_stations():
     
     table_html = df.to_html(classes='table table-bordered table-striped', index=False)
 
-    return render_template('table3.html', df=df,n = df.shape[0],file_name='nearest_stations')
+    return render_template('table3.html', df=df,n = df.shape[0],file_name='nearest_stations') # return html file passing df to html.
 ```
 
 <img src='Images/api_outputs/getTableData_nearest_stations.png' width='580' >
@@ -2367,4 +2368,67 @@ if __name__=='__main__':
     app.run(host='10.2.3.251',debug=True)
 ```
 
+
+## Appendix
+
+### Common Error Handling
+
+1. Incorrect Key value 
+
+<img src='Images/errors/key_error.png' width='580' >
+
+Key value should always be `123`
+
+2. Invalid Date format
+
+<img src='Images/errors/invalid date format.png' width='580' >
+
+Date format should be yyyy-mm-dd
+
+3. Date range error
+
+<img src='Images/errors/date_range_error.png' width='580' >
+
+Start date should always be less than End date.
+
+4. Invalid hour value
+
+<img src='Images/errors/invalid_hour_error.png' width='580' >
+
+Hour value should always be between 0-23
+
+5. Invalid zipcode
+
+<img src='Images/errors/invalid_zip_code.png' width='580' >
+
+
+
+### Additional information
+
+- Current Weather API gives you weather data at different levels for the year 2022.
+- For houlry weather data , we have loaded weather data for stations limited to polygon region mentioned above.
+- For daily weather data, we have loaded weather data for all the stations over the world.
+- Weather data for years other than 2022 is not included in this project, but we can use the loader scripts to load the data and API code remains the same.
+
+### Code optimizations
+
+- Inserting millions of rows to MySQL table takes a lot of time, therefore we used the below lines of code which increases the speed of inserting data to mySQL table. This set of code uses fast_execute_many method to load multiple rows at the same time.
+
+```python
+@event.listens_for(engine, "before_cursor_execute")
+def receive_before_cursor_execute(
+       conn, cursor, statement, params, context, executemany
+        ):
+            if executemany:
+                cursor.fast_executemany = True
+```
+
+- Indexing your table, will allow you to query your data very much faster. using the below set of code we can index the table using python based on columns which is unique together.
+
+```python
+update_index_sql='''CREATE UNIQUE INDEX sindex_name
+ON your_table (columns);'''
+
+engine.execute(update_index_sql)
+```
 

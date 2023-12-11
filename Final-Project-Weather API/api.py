@@ -248,6 +248,12 @@ def getData_by_station_id_by_daterange():
         res['msg']='Invalid entry'
         return json.dumps(res,indent=4)
     
+    if start_date > end_date:
+        res['code']=0
+        res['msg']='Invalid dates : start_date should be less than end date'
+        return json.dumps(res,indent=4)
+
+    
 
     get_zip_coords_sql=open('sql_scripts/get_data_by_station_id_by_daterange.sql').read()
     start_time=time.time()
@@ -314,6 +320,11 @@ def getTableData_by_station_id_by_daterange():
     except:
         res['code']=0
         res['msg']='Invalid entry'
+        return json.dumps(res,indent=4)
+    
+    if start_date > end_date:
+        res['code']=0
+        res['msg']='Invalid dates : start_date should be less than end date'
         return json.dumps(res,indent=4)
     
 
@@ -443,6 +454,11 @@ def getData_by_zip_by_daterange():
         res['msg']='Invalid date'
         return json.dumps(res,indent=4)
     
+    if start_date > end_date:
+        res['code']=0
+        res['msg']='Invalid dates : start_date should be less than end date'
+        return json.dumps(res,indent=4)
+    
 
     get_zip_coords_sql=open('sql_scripts/get_zip_coords.sql').read()
     cur.execute(get_zip_coords_sql,(given_zip))
@@ -531,6 +547,11 @@ def getTableData_by_zip_by_daterange():
     except:
         res['code']=0
         res['msg']='Invalid date'
+        return json.dumps(res,indent=4)
+
+    if start_date > end_date:
+        res['code']=0
+        res['msg']='Invalid dates : start_date should be less than end date'
         return json.dumps(res,indent=4)
     
 
